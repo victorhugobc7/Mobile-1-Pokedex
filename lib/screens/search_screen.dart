@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Digite o nome ou ID do Pokémon',
+                labelText: 'Digite o nome do Pokémon',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: _performSearch,

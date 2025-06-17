@@ -14,21 +14,21 @@ class ApiService {
       final List<Future<Pokemon>> futures = results.map((p) => fetchPokemonDetails(p['name'])).toList();
       return await Future.wait(futures);
     } else {
-      throw Exception('Failed to load Pokémon list');
+      throw Exception('Falha ao carregar essa lista');
     }
   }
 
   Future<Pokemon> fetchPokemonDetails(String nameOrId, {bool fetchEvolutions = true}) async {
     final pokemonResponse = await http.get(Uri.parse('$_baseUrl/pokemon/$nameOrId'));
-    if (pokemonResponse.statusCode != 200) throw Exception('Failed to load Pokémon details for $nameOrId');
+    if (pokemonResponse.statusCode != 200) throw Exception('Falha ao carregar detalhes para $nameOrId');
     final pokemonJson = jsonDecode(pokemonResponse.body);
 
     final speciesUrl = pokemonJson['species']['url'];
     final speciesResponse = await http.get(Uri.parse(speciesUrl));
-    if (speciesResponse.statusCode != 200) throw Exception('Failed to load Pokémon species');
+    if (speciesResponse.statusCode != 200) throw Exception('Falha ao carregar esse pokemon');
     final speciesJson = jsonDecode(speciesResponse.body);
 
-    String description = 'No description available.';
+    String description = 'Nenhuma descrição disponível :(';
     for (var entry in speciesJson['flavor_text_entries']) {
       if (entry['language']['name'] == 'en') {
         description = entry['flavor_text'].replaceAll('\n', ' ').replaceAll('\f', ' ');

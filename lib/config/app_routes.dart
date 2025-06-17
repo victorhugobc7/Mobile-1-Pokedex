@@ -28,7 +28,7 @@ class AppRoutes {
           final pokemon = settings.arguments as Pokemon;
           return MaterialPageRoute(builder: (_) => PokemonDetailScreen(pokemon: pokemon));
         }
-        return _errorRoute('Argumento inválido para a rota de detalhes.');
+        return _errorRoute('Rota invalida.');
 
       case favorites:
         return MaterialPageRoute(builder: (_) => const FavoritesScreen());
@@ -41,7 +41,7 @@ class AppRoutes {
           final typeName = settings.arguments as String;
           return MaterialPageRoute(builder: (_) => TypeResultsScreen(typeName: typeName));
         }
-        return _errorRoute('Argumento de tipo inválido.');
+        return _errorRoute('ipo inválido.');
 
       default:
         return _errorRoute('Página não encontrada.');

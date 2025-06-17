@@ -71,6 +71,17 @@ class _TimelineScreenState extends State<TimelineScreen> {
     }
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _isLoading = false;
+      _hasMore = true;
+      _offset = 0;
+      _pokemonList.clear();
+      _error = null;
+    });
+    await _loadMorePokemon();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -132,40 +143,43 @@ class _TimelineScreenState extends State<TimelineScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null && _pokemonList.isEmpty) {
-      return ErrorView(message: _error!, onRetry: _loadMorePokemon);
+      return ErrorView(message: _error!, onRetry: _refresh);
     }
-    return Consumer<FavoritesService>(
-      builder: (context, favoritesService, child) {
-        return GridView.builder(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(12.0),
-          itemCount: _pokemonList.length + (_hasMore || _error != null ? 1 : 0),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.0,
-          ),
-          itemBuilder: (context, index) {
-            if (index >= _pokemonList.length) {
-              if (_error != null) {
-                return Center(
-                  child: IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.red, size: 30),
-                    onPressed: _loadMorePokemon,
-                  ),
-                );
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: Consumer<FavoritesService>(
+        builder: (context, favoritesService, child) {
+          return GridView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(12.0),
+            itemCount: _pokemonList.length + (_hasMore || _error != null ? 1 : 0),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.0,
+            ),
+            itemBuilder: (context, index) {
+              if (index >= _pokemonList.length) {
+                if (_error != null) {
+                  return Center(
+                    child: IconButton(
+                      icon: const Icon(Icons.refresh, color: Colors.red, size: 30),
+                      onPressed: _loadMorePokemon,
+                    ),
+                  );
+                }
+                return _hasMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
               }
-              return _hasMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
-            }
-            final pokemon = _pokemonList[index];
-            return PokeCell(
-              pokemon: pokemon,
-              isFavorite: favoritesService.isFavorite(pokemon.id),
-            );
-          },
-        );
-      },
+              final pokemon = _pokemonList[index];
+              return PokeCell(
+                pokemon: pokemon,
+                isFavorite: favoritesService.isFavorite(pokemon.id),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

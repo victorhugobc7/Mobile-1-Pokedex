@@ -14,25 +14,38 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  Future<List<Pokemon>>? _favoritePokemonsFuture;
+  late Future<List<Pokemon>> _favoritePokemonsFuture;
   final _apiService = ApiService();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadFavorites();
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchFavorites();
+    });
+    Provider.of<FavoritesService>(context, listen: false).addListener(_onFavoritesChanged);
   }
 
-  void _loadFavorites() {
-    final favoritesService = Provider.of<FavoritesService>(context);
-    final favoriteIds = favoritesService.favoritePokemonIds;
+  @override
+  void dispose() {
+    Provider.of<FavoritesService>(context, listen: false).removeListener(_onFavoritesChanged);
+    super.dispose();
+  }
 
-    final futures = favoriteIds.map((id) =>
-        _apiService.fetchPokemonDetails(id.toString(), fetchEvolutions: false)
-    ).toList();
+  void _onFavoritesChanged() {
+    if (mounted) {
+      _fetchFavorites();
+    }
+  }
 
+  void _fetchFavorites() {
+    final favoriteIds = Provider.of<FavoritesService>(context, listen: false).favoritePokemonIds;
     setState(() {
-      _favoritePokemonsFuture = Future.wait(futures);
+      _favoritePokemonsFuture = Future.wait(
+          favoriteIds.map((id) =>
+              _apiService.fetchPokemonDetails(id.toString(), fetchEvolutions: false)
+          ).toList()
+      );
     });
   }
 
@@ -61,11 +74,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               if (snapshot.hasError) {
                 return ErrorView(
                   message: 'Erro ao carregar favoritos.',
-                  onRetry: () {
-                    setState(() {
-                      _loadFavorites();
-                    });
-                  },
+                  onRetry: _fetchFavorites,
                 );
               }
 
