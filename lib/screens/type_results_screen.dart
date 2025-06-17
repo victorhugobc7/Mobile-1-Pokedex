@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../components/poke_cell.dart';
+import '../components/error_view.dart';
 import '../models/pokemon_post.dart';
 import '../services/api_service.dart';
 import '../services/favorites_service.dart';
@@ -20,14 +21,20 @@ class _TypeResultsScreenState extends State<TypeResultsScreen> {
   @override
   void initState() {
     super.initState();
-    _pokemonsFuture = _apiService.fetchPokemonsByType(widget.typeName);
+    _fetchData();
+  }
+
+  void _fetchData() {
+    setState(() {
+      _pokemonsFuture = _apiService.fetchPokemonsByType(widget.typeName);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pokémon do Tipo: ${widget.typeName[0].toUpperCase() + widget.typeName.substring(1)}'),
+        title: Text('Tipo: ${widget.typeName[0].toUpperCase() + widget.typeName.substring(1)}'),
       ),
       body: FutureBuilder<List<Pokemon>>(
         future: _pokemonsFuture,
@@ -36,7 +43,10 @@ class _TypeResultsScreenState extends State<TypeResultsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Erro ao carregar Pokémon: ${snapshot.error}'));
+            return ErrorView(
+              message: 'Erro ao carregar Pokémon do tipo ${widget.typeName}.',
+              onRetry: _fetchData,
+            );
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Nenhum Pokémon encontrado para este tipo.'));

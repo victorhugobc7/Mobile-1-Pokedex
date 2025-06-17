@@ -14,22 +14,16 @@ class PokeCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppRoutes.details, arguments: pokemon);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            )
-          ],
-        ),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      elevation: 4.0,
+      shadowColor: Colors.black.withOpacity(0.2),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.details, arguments: pokemon);
+        },
         child: Stack(
           children: [
             Positioned(
@@ -56,12 +50,15 @@ class PokeCell extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.network(
-                    pokemon.imageUrl,
-                    height: 90,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.error, color: Colors.red),
+                  Hero(
+                    tag: 'pokemon-${pokemon.id}',
+                    child: Image.network(
+                      pokemon.imageUrl,
+                      height: 90,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.error, color: Colors.red),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(

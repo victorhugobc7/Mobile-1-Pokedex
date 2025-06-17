@@ -4,7 +4,7 @@ import '../screens/timeline_screen.dart';
 import '../screens/pokemon_details_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/search_screen.dart';
-import '../screens/login_screen.dart';
+import '../screens/First_screen.dart';
 import '../screens/type_results_screen.dart';
 
 class AppRoutes {

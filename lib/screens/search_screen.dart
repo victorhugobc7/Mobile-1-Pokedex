@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../components/poke_cell.dart';
+import '../components/error_view.dart';
 import '../models/pokemon_post.dart';
 import '../services/api_service.dart';
 import '../services/favorites_service.dart';
@@ -20,10 +21,11 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _isLoading = false;
   String? _error;
 
-  void _performSearch() async {
+  Future<void> _performSearch() async {
     final searchTerm = _searchController.text.trim().toLowerCase();
     if (searchTerm.isEmpty) return;
 
+    FocusScope.of(context).unfocus();
     setState(() {
       _isLoading = true;
       _error = null;
@@ -34,7 +36,7 @@ class _SearchScreenState extends State<SearchScreen> {
       final pokemon = await _apiService.fetchPokemonDetails(searchTerm);
       if (mounted) setState(() => _foundPokemon = pokemon);
     } catch (e) {
-      if (mounted) setState(() => _error = 'Pokémon não encontrado.');
+      if (mounted) setState(() => _error = 'Falha ao buscar Pokémon.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -71,8 +73,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildResultView() {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_error != null) return Center(child: Text(_error!));
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return ErrorView(message: _error!, onRetry: _performSearch);
+    }
     if (_foundPokemon != null) {
       return Consumer<FavoritesService>(
         builder: (context, favoritesService, child) {
