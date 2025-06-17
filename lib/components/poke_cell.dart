@@ -1,54 +1,83 @@
 import 'package:flutter/material.dart';
+import '../config/app_routes.dart';
+import '../models/pokemon_post.dart';
 
-class pokeCell extends StatelessWidget {
+class PokeCell extends StatelessWidget {
+  final Pokemon pokemon;
+  final bool isFavorite;
 
-  pokeCell({super.key});
-  bool isFavorite = false;
-  String pokemonName = 'Bulbasaur';
-  String pokemonUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png';
+  const PokeCell({
+    super.key,
+    required this.pokemon,
+    required this.isFavorite,
+  });
 
   @override
-  Widget build(BuildContext context){
-    return Container(
-      margin: EdgeInsets.all(5),
-      height: 100,
-      width: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [ BoxShadow(
-          color: Colors.grey.withValues(alpha: 0.5),
-          spreadRadius: 5,
-          blurRadius: 7,
-          offset: Offset(0, 3),
-        )],
-      ),
-      child: FittedBox(
-        fit: BoxFit.fill,
-        child:
-          Stack(
-            children: [
-              Positioned.fill(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text(pokemonName,
-                      style: TextStyle(color: Colors.green,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                      )
-                  ),
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.details, arguments: pokemon);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            )
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              bottom: 8,
+              left: 8,
+              right: 8,
+              child: Text(
+                '#${pokemon.id.toString().padLeft(3, '0')}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
-              Opacity(
-                opacity: isFavorite ? 1.0 : 0.0,
-                child: Icon(Icons.star, color: Colors.yellow,),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: isFavorite
+                  ? const Icon(Icons.star, color: Colors.amber, size: 24)
+                  : const SizedBox.shrink(),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                    pokemon.imageUrl,
+                    height: 90,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.error, color: Colors.red),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    pokemon.name[0].toUpperCase() + pokemon.name.substring(1),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
               ),
-              Image(
-                    image: NetworkImage(pokemonUrl)
-              ),
-            ],
-          ),
+            ),
+          ],
+        ),
       ),
     );
-}
+  }
 }

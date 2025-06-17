@@ -1,40 +1,26 @@
 class Pokemon {
   final String name;
   final String imageUrl;
-  final String firstTypeSlot;
-  final String secondTypeSlot;
+  final List<String> types;
   final int weight;
   final int height;
   final String cryUrl;
-
+  final int id;
+  final String description;
+  final List<Pokemon> evolutionChain;
 
   Pokemon({
     required this.name,
     required this.imageUrl,
-    required this.firstTypeSlot,
-    required this.secondTypeSlot,
+    required this.types,
     required this.weight,
     required this.height,
     required this.cryUrl,
+    required this.id,
+    required this.description,
+    required this.evolutionChain,
   });
 
-  factory Pokemon.fromJson(Map<String, dynamic> json) {
-    final name = json['name'];
-    final imageUrl = json['sprites']['front_default'];
-    final firstTypeSlot = json['types'][0]['type']['name'];
-    final secondTypeSlot = json['types'][1]['type']['name'] | '';
-    final weight = json['weight'];
-    final height = json['height'];
-    final cryUrl = json['cries']['latest'];
-
-    return Pokemon(
-        name: name,
-        imageUrl: imageUrl,
-        firstTypeSlot: firstTypeSlot,
-        secondTypeSlot: secondTypeSlot,
-        weight: weight,
-        height: height,
-        cryUrl: cryUrl,
-    );
-  }
+  double get weightInKg => weight / 10.0;
+  double get heightInMeters => height / 10.0;
 }

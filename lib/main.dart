@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:finalprojectfinal/screens/timeline_screen.dart';
+import 'package:provider/provider.dart';
+import 'config/app_routes.dart';
+import 'services/favorites_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,11 +10,26 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: TimelineScreen(),
-      );
+    return ChangeNotifierProvider(
+      create: (context) => FavoritesService(),
+      child: MaterialApp(
+        title: 'Pokédex',
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          scaffoldBackgroundColor: const Color(0xFFF0F2F5),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            elevation: 2,
+          ),
+        ),
+        initialRoute: AppRoutes.login,
+        onGenerateRoute: AppRoutes.generateRoute,
+        debugShowCheckedModeBanner: false,
+      ),
+    );
   }
 }
